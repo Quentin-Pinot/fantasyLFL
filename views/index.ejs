@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link media="all" rel="stylesheet" type="text/css" href="views/css/main.css">
+
+    <title>LFL - Predict</title>
+
+    <script src="views/vendor/jquery/jquery-3.2.1.min.js"></script>
+</head>
+
+<body>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nickname</th><th>Role</th><th>Total points</th><th>AveragePTS</th><th>Team</th>
+                </tr>
+            </thead>
+            <tbody id="joueur">
+
+            </tbody>
+        </table>
+    </div>
+
+
+
+    
+    <script>
+        let playerRanked = <%- JSON.stringify(PlayersRanked) %>;
+
+        console.log(playerRanked);
+
+        let joueur = $('#joueur');
+
+        playerRanked.forEach(player =>
+        {
+            let nickname = '<td>' + player.nickname + '</td>';
+            let role = '<td>' + player.role + '</td>';
+            let total_score = '<td>' + player.total_score + '</td>';
+
+            let averagePUNTOS = 0;
+
+            for (let i in player.scores) 
+            { 
+                averagePUNTOS += player.scores[i].baseScore; 
+            }
+            
+            averagePUNTOS = averagePUNTOS / player.scores.length
+
+            let averagePts = '<td>' + precise(averagePUNTOS) + '</td>';
+            let team = '<td>' + player.team_name + '</td>';
+            
+            let row = '<tr>' + nickname + role + total_score + averagePts + team + '</tr>';      
+
+            joueur.append(row);
+        }); 
+
+        function precise(x) {
+            return Number.parseFloat(x).toPrecision(4);
+          }
+    </script>
+</body>
+</html>
