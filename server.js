@@ -2943,46 +2943,46 @@ const {
                     "bestEachLose" : {},
                     "bestTotal" : {}
                 },
-                "player" : {
-                    "TOP" : {
+                "player" : {//////////////////////////////////  
+                    "TOP" : {///////////////////////////////// stats + items pts + pts + players at this role  + more personnal players at this roles datas (same as role)
                         // todo : for all make a player an Objt
                         // todo : verify if all var are ok in players 
-                        "players" : {},
-                        "bestTotal" : {},
-                        "bestWin" : {},
-                        "bestLose" : {},
-                        "points" : {
+                        "players" : {},                     // stats + items + pts for each players at it role
+                        "bestTotal" : {},                   // which players at this role is the best overall
+                        "bestWin" : {},                     // which players at this role is the best in case of win
+                        "bestLose" : {},                    // which players at this role is the best in case of lose
+                        "points" : {////////////////////////// stats + items + pts for role
                             // todo : do it for all role players
                             // todo : do it for all int var
-                            "eachGames" : [],
-                            "total" : 0,
-                            "win" : 0,
-                            "lose" : 0,
-                            "averageTotal" : 0,
-                            "averageWin" : 0,
-                            "averageLose" : 0
+                            "eachGames" : [],               // pts for each game
+                            "total" : 0,                    // total pts overal
+                            "win" : 0,                      // total pts for the wins games
+                            "lose" : 0,                     // total pts for the wins loses
+                            "averageTotal" : 0,             // average overall pts
+                            "averageWin" : 0,               // average pts for wins
+                            "averageLose" : 0               // average pts for loses
                         },
-                        "metrics" : {
-                            "eachGames" : [],
-                            "total" : {},
-                            "win" : {},
-                            "lose" : {},
-                            "averageTotal" : {},
-                            "averageWin" : {},
-                            "averageLose" : {}
+                        "metrics" : {///////////////////////// stats of the role
+                            "eachGames" : [],               // stats for each games
+                            "total" : {},                   // total overall
+                            "win" : {},                     // total for each win
+                            "lose" : {},                    // total for each lose
+                            "averageTotal" : {},            // average overall
+                            "averageWin" : {},              // average for each win
+                            "averageLose" : {}              // average for each lose
                         },
-                        "items" : {
-                            "eachGames" : [],
-                            "total" : {},
-                            "win" : {},
-                            "lose" : {},
-                            "averageTotal" : {},
-                            "averageWin" : {},
-                            "averageLose" : {},
-                            "bestEachGames" : [],
-                            "bestWin" :{},
-                            "bestLose" : {},
-                            "bestTotal" : {}
+                        "items" : {/////////////////////////// pts per items
+                            "eachGames" : [],               // each games
+                            "total" : {},                   // total of point per items
+                            "win" : {},                     // total of point per items per win
+                            "lose" : {},                    // total of point per items per lose
+                            "averageTotal" : {},            // average of point per items
+                            "averageWin" : {},              // average of point per items per win
+                            "averageLose" : {},             // average of point per items per lose
+                            "bestEachGames" : [],           // rank the items for each games
+                            "bestWin" :{},                  // rank the items for each win
+                            "bestLose" : {},                // rank the items for each lose
+                            "bestTotal" : {}                // rank the items overall
                         }
                     },
                     "JUNGLER" : {
@@ -3403,7 +3403,6 @@ app.get("/team", (req, res) =>
                         lflTeams[teams[i].teamData.visitor.team.slug]['score'].push({});
                         lflTeams[teams[i].teamData.visitor.team.slug]['score'][lflTeams[teams[i].teamData.visitor.team.slug]['score'].length - 1][teams[i].teamData.local.team.slug] = teams[i].teamData.visitor.score;
 
-
                         // Points
                         // player : points, items, metrics
                         // ON TRAITE CHAQUE ROLE DE NOTRE TEAM UN PAR UN QUI RECOIT LES DONNEES
@@ -3659,215 +3658,71 @@ app.get("/team", (req, res) =>
                                 // Best items overAll Classement de chaque items & assignement 
                                 lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestTotal'] = Object.fromEntries(Object.entries(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].averageTotal).sort(([,a],[,b]) => b-a));
                             }
-
+                            
+                            // todo : filled the empties space with the data from teams[i]
                             // Si il n'y a pas de joueur ajouté à ce role on en créer et on le remplit
-                            // lflTeams.team.points.player.ROLE.property
-                            if (lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].hasOwnProperty(teams[i].teamData.local.players[j].player.nickname) == false)
+                            // lflTeams.team.points.player.ROLE.points
+                            // eachGames
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachGames.push();
+
+                            // todo : add this tab of win
+                            if ()
                             {
-                                // création du premier joueur 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname] = {};
-
-                                // création de son object concernant les pts
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname]['points'] = {};
-
-                                // Suivit des pts pour each games
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['eachGames'] = [];
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.eachGames.push(teams[i].matchesData.local.players[j].score);
-
-                                // Points totaux
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['total'] = teams[i].matchesData.local.players[j].score;
-
-                                // Points en cas de win
-                                if (teams[i].teamData.local.team.score == 1) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['win'] = teams[i].matchesData.local.players[j].score; }
-
-                                // Points en cas de lose
-                                if (teams[i].teamData.local.team.score == 0) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['lose'] = teams[i].matchesData.local.players[j].score; }
-
-                                // averageTotal 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['averageTotal'] = teams[i].matchesData.local.players[j].score;
-
-                                 // averageWin
-                                 if (teams[i].teamData.local.team.score == 1) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['averageWin'] = teams[i].matchesData.local.players[j].score; }
-
-                                // averageLose
-                                if (teams[i].teamData.local.team.score == 0) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['averageLose'] = teams[i].matchesData.local.players[j].score; }
-                                
-
-                                // Création du suivis de ses scores avec l'équipe
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname]['score'] = [];
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score.push({});
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname][lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score.length - 1][teams[i].teamData.visitor.team.slug] = teams[i].teamData.local.score;
-
-                                // création de sa rubrique items
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname]['items'] = {};
-
-                                // pour chaque items à chaque games ses stats 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['eachGames'] = [];
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.eachGames.push(teams[i].teamData.local.players[j].items);
-
-                                // Total de chaque items pour toutes les games
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['total'] = teams[i].teamData.local.players[j].items;
-
-                                // Total de chaque items en cas de win
-                                if (teams[i].teamData.local.team.score == 1) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['win'] = teams[i].teamData.local.players[j].items };
-
-                                // total de chaque items en cas de lose
-                                if (teams[i].teamData.local.team.score == 0) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['lose'] = teams[i].teamData.local.players[j].items };
-
-                                // Average total des items
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageTotal'] = teams[i].teamData.local.players[j].items;
-
-                                // Average en fonction des wins
-                                if (teams[i].teamData.local.team.score == 1) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageWin'] = teams[i].teamData.local.players[j].items };
-
-                                // Average en fonction des loses
-                                if (teams[i].teamData.local.team.score == 0) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageLose'] = teams[i].teamData.local.players[j].items };
-
-                                // Création de la rubrique bestEachGames
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestEachGames'] = [];
-
-                                // Classement de chaque items & assignement 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.bestEachGames.push(Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a)));
-
-                                // Best items for the wins Classement de chaque items & assignement 
-                                if (teams[i].teamData.local.team.score == 1) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestWin'] = Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a)) };
-
-                                // Best items for the Loses Classement de chaque items & assignement 
-                                if (teams[i].teamData.local.team.score == 0) { lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestLose'] = Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a)) };
-
-                                // Best items overAll Classement de chaque items & assignement 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestTotal'] = Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a));
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachWin.push();
                             }
                             else
                             {
-                                // add the pts of the player to the tab
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.eachGames.push(teams[i].matchesData.local.players[j].score);
-
-                                // Points totaux
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.total = sumTab(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.eachGames);
-
-                                //  Points en cas de win
-                                if (teams[i].teamData.local.team.score == 1 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.win != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.win += teams[i].matchesData.local.players[j].score; 
-                                }
-                                else if (teams[i].teamData.local.team.score == 1)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['win'] = teams[i].matchesData.local.players[j].score;
-                                }
-
-                                // Points en cas de lose
-                                if (teams[i].teamData.local.team.score == 0 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.lose != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.lose += teams[i].matchesData.local.players[j].score; 
-                                }
-                                else if (teams[i].teamData.local.team.score == 0)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['lose'] = teams[i].matchesData.local.players[j].score;
-                                }
-
-                                // averageTotal 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.averageTotal = averageTab(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.eachGames);
-
-                                 // averageWin
-                                if (teams[i].teamData.local.team.score == 1 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.averageWin != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.averageWin = avWin(lflTeams[teams[i].teamData.visitor.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.visitor.team.slug].points.player)[j]].players[teams[i].teamData.visitor.players[j].player.nickname].score, lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.win); 
-                                }
-                                else if (teams[i].teamData.local.team.score == 1)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['averageWin'] = teams[i].matchesData.local.players[j].score; 
-                                }
-
-                                // averageLose
-                                if (teams[i].teamData.local.team.score == 0 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.averageLose != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.averageLose = avLose(lflTeams[teams[i].teamData.visitor.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.visitor.team.slug].points.player)[j]].players[teams[i].teamData.visitor.players[j].player.nickname].score, lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points.lose); 
-                                }
-                                else if (teams[i].teamData.local.team.score == 0)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].points['averageLose'] = teams[i].matchesData.local.players[j].score; 
-                                }
-  
-
-                                //  Cas ou le joueur existe gestion de son score
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score.push({});
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname][lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score.length - 1][teams[i].teamData.visitor.team.slug] = teams[i].teamData.local.score;
-
-                                // Add his stats to the eachGames object
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.eachGames.push(teams[i].teamData.local.players[j].items);
-
-                                // Total de chaque items pour toutes les games
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].total = sum2Object(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].total, teams[i].teamData.local.players[j].items);
-
-                                // Total de chaque items en cas de win
-                                if (teams[i].teamData.local.team.score == 1 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.win != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.win = sum2Object(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].win, teams[i].teamData.local.players[j].items) ;
-                                }
-                                else if (teams[i].teamData.local.team.score == 1)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['win'] = teams[i].teamData.local.players[j].items;
-                                }
-
-                                // total de chaque items en cas de lose
-                                if (teams[i].teamData.local.team.score == 0 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.lose != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.lose = sum2Object(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].lose, teams[i].teamData.local.players[j].items); 
-                                }
-                                else if (teams[i].teamData.local.team.score == 0)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['lose'] = teams[i].teamData.local.players[j].items;
-                                }
-
-                                // Average total des items
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.averageTotal = averageTabObjectToObject(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.eachGames);
-
-                                // Average en fonction des wins attention win peut ne pas exister et le créer pour chaque donc ne pas passer par .win mais par ['win']
-                                if (teams[i].teamData.local.team.score == 1 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.averageWin != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.averageWin = averageWin(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score, lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.win);
-                                }
-                                else if (teams[i].teamData.local.team.score == 1)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageWin'] = teams[i].teamData.local.players[j].items;
-                                }
-                                // Average en fonction des loses
-                                if (teams[i].teamData.local.team.score == 0 && typeof lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.averageLose != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.averageLose = averageLose(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].score, lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.lose);
-                                }
-                                else if (teams[i].teamData.local.team.score == 0)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageLose'] = teams[i].teamData.local.players[j].items;
-                                }
-
-                                // best Each Games items
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.bestEachGames.push(Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a)));
-
-                                // Best items for the wins Classement de chaque items & assignement 
-                                if (teams[i].teamData.local.team.score == 1 && lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestWin'] != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.bestWin = Object.fromEntries(Object.entries(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageWin']).sort(([,a],[,b]) => b-a)); 
-                                }
-                                else if (teams[i].teamData.local.team.score == 1)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestWin'] = Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a));
-                                }
-
-                                // Best items for the Loses Classement de chaque items & assignement 
-                                if (teams[i].teamData.local.team.score == 0 && lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.bestLose != "undefined") 
-                                { 
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items.bestLose = Object.fromEntries(Object.entries(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['averageLose']).sort(([,a],[,b]) => b-a)); 
-                                }
-                                else if (teams[i].teamData.local.team.score == 0)
-                                {
-                                    lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestLose'] = Object.fromEntries(Object.entries(teams[i].teamData.local.players[j].items).sort(([,a],[,b]) => b-a));
-                                }
-
-                                // Best items overAll Classement de chaque items & assignement 
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestTotal'] = Object.fromEntries(Object.entries(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].averageTotal).sort(([,a],[,b]) => b-a));
+                                // todo : add this tab of lose
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachLose.push();
                             }
+
+                            // total
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.total += ;
+
+                            // win
+                            if ()
+                            {
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.win += ;
+                            }
+                            
+                            // lose 
+                            if ()
+                            {
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.lose += ;
+                            }
+
+                            // averageTotal
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageTotal = avTotal(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachGames);
+
+                            // averageWin
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageWin = avWin();
+
+                            // averageLose
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageLose = avLose();
+
+                            // lflTeams.team.points.player.ROLE.metrics
+                            // eachGames
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.eachGames.push();
+
+                            // total
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.total = ;
+
+                            // win
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.win = ;
+
+                            // lose
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.lose = ;
+
+                            // averageTotal
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageTotal = ;
+
+                            // averageWin
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageWin = ;
+
+                            // averageLose
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageLose = ;
+
+                            
 
                             // VISITOR
                             // Si il n'y a pas de joueur ajouté à ce role on en créer et on le remplit
