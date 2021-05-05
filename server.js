@@ -3,7 +3,10 @@ let bodyParser = require("body-parser");
 let gotHttp = require("got");
 let moment = require('moment');
 let fs = require('fs');
-const { kill } = require('process');
+const { kill, cpuUsage } = require('process');
+const { knownHookEvents } = require('got');
+const e = require('express');
+const https = require('https')
 
 
 /*
@@ -123,11 +126,11 @@ let date = `${moment().format('DD-MM-YYYY')} ${moment().format('HH:mm:ss')} -> `
 const {
     PORT = 32222,
     lecPlayer = 'https://api-lec.superfantasylol.com/api/v1/playerinfos/',
-    lefGames = 'https://api-lec.superfantasylol.com/api/v1/games/',
-    lecCollection = 'https://api-lec.superfantasylol.com/api/v1/users/bigc/collection',
+    lecMatches = 'https://api-lec.superfantasylol.com/api/v1/matches/',
+    lecGames = 'https://api-lec.superfantasylol.com/api/v1/games/',
     lflPlayer = 'https://api-lfl.superfantasylol.com/api/v1/playerinfos/',
-    lflGames = 'https://api-lfl.superfantasylol.com/api/v1/games/',
-    lflMatches = 'https://api-lfl.superfantasylol.com/api/v1/matches/',
+    lflGames = 'https://api-lfl.superfantasylol.com/api/v1/games/',                         // Games : metrics + items of both teams and the who win this
+    lflMatches = 'https://api-lfl.superfantasylol.com/api/v1/matches/',                     // Matches : get the base pts of each players
     lflTeams = {
         "misfitspremier" : {
             "name" : 'Misfits Premier',
@@ -2955,6 +2958,8 @@ const {
                             // todo : do it for all role players
                             // todo : do it for all int var
                             "eachGames" : [],               // pts for each game
+                            "eachWin" : [],                 // pts for each Win
+                            "eachLose" : [],                // pts for each Lose
                             "total" : 0,                    // total pts overal
                             "win" : 0,                      // total pts for the wins games
                             "lose" : 0,                     // total pts for the wins loses
@@ -3274,8 +3279,7 @@ const {
 '62e43603-55b3-11eb-892c-065e1d3d7cd4',
 '5e927993-55b3-11eb-892c-065e1d3d7cd4',
 '582e882b-55b3-11eb-892c-065e1d3d7cd4'
-    ],
-    lflCollection = 'https://api-lfl.superfantasylol.com/api/v1/users/bigc/collection'
+    ]
 } = process.env;
 
 
@@ -3307,6 +3311,9 @@ app.get("/", (req, res) =>
         res.render('index.ejs', { PlayersRanked : peopleData });
     })();
 });
+
+
+
 
 
 app.get("/team", (req, res) => 
@@ -3659,68 +3666,67 @@ app.get("/team", (req, res) =>
                                 lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].items['bestTotal'] = Object.fromEntries(Object.entries(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].players[teams[i].teamData.local.players[j].player.nickname].averageTotal).sort(([,a],[,b]) => b-a));
                             }
                             
-                            // todo : filled the empties space with the data from teams[i]
                             // Si il n'y a pas de joueur ajouté à ce role on en créer et on le remplit
                             // lflTeams.team.points.player.ROLE.points
-                            // eachGames
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachGames.push();
 
-                            // todo : add this tab of win
-                            if ()
-                            {
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachWin.push();
-                            }
-                            else
-                            {
-                                // todo : add this tab of lose
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachLose.push();
-                            }
+                            // eachGames
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachGames.push(teams[i].teamData.local.players[j].score);
 
                             // total
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.total += ;
-
-                            // win
-                            if ()
-                            {
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.win += ;
-                            }
-                            
-                            // lose 
-                            if ()
-                            {
-                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.lose += ;
-                            }
+                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.total += teams[i].teamData.local.players[j].score;
 
                             // averageTotal
                             lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageTotal = avTotal(lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachGames);
 
-                            // averageWin
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageWin = avWin();
+                            
+                            if (teams[i].teamData.local.score == 1)
+                            {
+                                // pts of eachWin
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachWin.push(teams[i].teamData.local.players[j].score);
 
-                            // averageLose
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageLose = avLose();
+                                // pts for all the win
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.win += teams[i].teamData.local.players[j].score;
 
-                            // lflTeams.team.points.player.ROLE.metrics
-                            // eachGames
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.eachGames.push();
+                                // todo : average per Win
+                                // averageWin
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageWin = avWin();
+                            }
+                            else
+                            {
+                                // tab of lose
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.eachLose.push(teams[i].teamData.local.players[j].score);
 
-                            // total
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.total = ;
+                                // pts for all the lose
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.lose += teams[i].teamData.local.players[j].score;
 
-                            // win
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.win = ;
+                                // todo : average per lose
+                                // averageLose
+                                lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].points.averageLose = avLose();
+                            }
+                           
+                            
 
-                            // lose
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.lose = ;
+                            // // lflTeams.team.points.player.ROLE.metrics
+                            // // eachGames
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.eachGames.push();
 
-                            // averageTotal
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageTotal = ;
+                            // // total
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.total = ;
 
-                            // averageWin
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageWin = ;
+                            // // win
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.win = ;
 
-                            // averageLose
-                            lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageLose = ;
+                            // // lose
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.lose = ;
+
+                            // // averageTotal
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageTotal = ;
+
+                            // // averageWin
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageWin = ;
+
+                            // // averageLose
+                            // lflTeams[teams[i].teamData.local.team.slug].points.player[Object.keys(lflTeams[teams[i].teamData.local.team.slug].points.player)[j]].metrics.averageLose = ;
 
                             
 
@@ -4122,12 +4128,64 @@ function participationKills (playerK, playerA, hisMate1, hisMate2, hisMate3, his
     return (((playerK + playerA) / (playerK + hisMate1 + hisMate2 + hisMate3 + hisMate4)) * 100).toFixed(2);
 }
 
+// todo : processDataToPG
+app.get("/LFLprocessDataToPG", async(req, res) => 
+{
+    res.setHeader("Content-Type", "text/html");
+    
+    res.send('process the data to postgresql database');
+});
 
 
+// app.get("/LFLcompareListOfRealNameJson", async(req, res) => 
+// {
+//     res.setHeader("Content-Type", "text/html");
+    
+//     // matches : games
+//     data = JSON.parse(fs.readFileSync('data\\LFL\\winter 2020-2021\\listMatchesToGames.json', 'utf8'));
+
+//     lflListofMatchesAndGames = [];
+
+//     for (let [key, value] of Object.entries(data)) 
+//     {
+//         lflListofMatchesAndGames.push(key);  
+//         if (value instanceof Object)
+//         {
+//             for (let prop in value)
+//             {
+//                 lflListofMatchesAndGames.push(value[prop]);
+//             }
+//         }
+//         else{
+//             lflListofMatchesAndGames.push(value);
+//         }
+//     }
+
+//     fs.readdir('data\\winter 2020-2021\\allData\\', (err, filess) => 
+//     {
+//         //console.log(filess)
+//         files = filess.map(e => e.replace('.json', ''))
+
+//         files.forEach(file => 
+//         {
+//             console.log('json : ' + files.indexOf(file));
+
+//             if (!lflListofMatchesAndGames.includes(file))
+//             {
+//                 console.log(lflListofMatchesAndGames.includes(file))
+//                 console.log(file)
+//             }
+//             else
+//             {
+//                 console.log(lflListofMatchesAndGames.includes(file))
+//             }
+//         });
+//     });
+// });
 
 
-
-// app.get("/test", (req, res) => 
+// scrapping
+// app.get("/getMatchToGames", (req, res) => 
 // {
 //     res.setHeader("Content-Type", "text/html");
     
@@ -4138,20 +4196,57 @@ function participationKills (playerK, playerA, hisMate1, hisMate2, hisMate3, his
 
 //         let all = {};
 
-//         for (let i = 18; i--;)
+//         for (let i = 22; i--;)
 //         {
 //             console.log('Day -> ' + i);
 //             for (let j = 0; j < 5; j++)
 //             {
 //                 console.log('Game -> '+ j);
-//                 all[peopleData[i].matches[j].id] = peopleData[i].matches[j].games['0'].id;
 
+//                 switch(i)
+//                 {
+//                     case 0:
+//                         all[peopleData[i].matches[0].id] = ( typeof all[peopleData[i].matches[0].id] != 'undefined' && all[peopleData[i].matches[0].id] instanceof Array ) ? all[peopleData[i].matches[0].id] : []
+                        
+//                         if(peopleData[i].matches[0].games[j].status != 'SCHEDULED')
+//                         {
+//                             all[peopleData[i].matches[0].id].push(peopleData[i].matches[0].games[j].id) 
+//                         }
+//                         break;
+//                     case 1:
+//                         all[peopleData[i].matches[0].id] = ( typeof all[peopleData[i].matches[0].id] != 'undefined' && all[peopleData[i].matches[0].id] instanceof Array ) ? all[peopleData[i].matches[0].id] : []
+                        
+//                         if(peopleData[i].matches[0].games[j].status != 'SCHEDULED')
+//                         {
+//                             all[peopleData[i].matches[0].id].push(peopleData[i].matches[0].games[j].id) 
+//                         }
+//                         break;
+//                     case 2:
+//                         all[peopleData[i].matches[0].id] = ( typeof all[peopleData[i].matches[0].id] != 'undefined' && all[peopleData[i].matches[0].id] instanceof Array ) ? all[peopleData[i].matches[0].id] : []
+                        
+//                         if(peopleData[i].matches[0].games[j].status != 'SCHEDULED')
+//                         {
+//                             all[peopleData[i].matches[0].id].push(peopleData[i].matches[0].games[j].id) 
+//                         }
+//                         break;
+//                     case 3:
+//                         all[peopleData[i].matches[0].id] = ( typeof all[peopleData[i].matches[0].id] != 'undefined' && all[peopleData[i].matches[0].id] instanceof Array ) ? all[peopleData[i].matches[0].id] : []
+
+//                         if(peopleData[i].matches[0].games[j].status != 'SCHEDULED')
+//                         {
+//                             all[peopleData[i].matches[0].id].push(peopleData[i].matches[0].games[j].id) 
+//                         }
+//                         break;
+//                     default:
+//                         all[peopleData[i].matches[j].id] = peopleData[i].matches[j].games['0'].id;
+//                         break;
+//                 }          
 //             }
 //         }
 
 //         console.log(all);
 
-//         fs.writeFile('matchesGames.json', JSON.stringify(all), 'utf8', (err)=>
+//         fs.writeFile('data\\LFL\\winter 2020-2021\\listMatchesToGames.json', JSON.stringify(all), 'utf8', (err)=>
 //         {
 //             if(err)
 //             {
@@ -4162,4 +4257,300 @@ function participationKills (playerK, playerA, hisMate1, hisMate2, hisMate3, his
 //         res.render('index.ejs', { PlayersRanked : peopleData });
         
 //     })();
+// });
+
+
+// Scrapt the json file from the lfl website
+/*
+app.get("/scrap", (req, res) => 
+{
+    res.setHeader("Content-Type", "text/html");
+
+    let lflListofMatchesAndGames;            // charger le fichier matchesGames.json
+
+    fs.readFile('data\\LFL\\winter 2020-2021\\listMatchesToGames.json', 'utf8', (err, data) => 
+    { 
+        if (err) 
+        { 
+            console.log(`Error reading file from disk: ${err}`); 
+        } 
+        else 
+        { 
+            // matches : games
+            lflListofMatchesAndGames = JSON.parse(data); 
+            
+            for (let m in lflListofMatchesAndGames)
+            {
+                matches = (async () => 
+                {
+                    return await gotHttp(lflMatches + m).json().data;   
+                })();
+
+                console.log('matche : ' + Object.keys(lflListofMatchesAndGames).indexOf(m));
+
+                fs.writeFile('data\\winter 2020-2021\\allData\\' + m + '.json', JSON.stringify(matches), 'utf8', (err)=>
+                {
+                    if(err)
+                    {
+                        console.log(err)
+                    }
+                });
+
+
+
+                if (lflListofMatchesAndGames[m] instanceof Array)
+                {
+                    lflListofMatchesAndGames[m].forEach(element => 
+                    {
+                        games = (async () => 
+                        {
+                            return await gotHttp(lflGames + element).json().data;
+                        })();
+
+                        console.log('game : ' + lflListofMatchesAndGames[m][element]);
+
+                        fs.writeFile('data\\winter 2020-2021\\allData\\' + element + '.json', JSON.stringify(games), 'utf8', (err)=>
+                        {
+                            if(err)
+                            {
+                                console.log(err)
+                            }
+                        });
+                    })
+                }
+                else
+                {
+                    games = (async () => 
+                    {
+                        return await gotHttp(lflGames + lflListofMatchesAndGames[m]).json().data;
+                    })();
+
+                    console.log('game : ' + lflListofMatchesAndGames[m]);
+
+                    fs.writeFile('data\\winter 2020-2021\\allData\\' + lflListofMatchesAndGames[m] + '.json', JSON.stringify(games), 'utf8', (err)=>
+                    {
+                        if(err)
+                        {
+                            console.log(err)
+                        }
+                    });
+                }
+            }
+        }
+    });
+});
+*/
+
+
+
+// app.get("/LECgetMatchToGames", async (req, res) => 
+// {
+//     res.setHeader("Content-Type", "text/html");
+    
+//         let peopleData = await gotHttp('https://api-lec.superfantasylol.com/api/v1/gamedays').json();
+//         peopleData = peopleData.data;
+
+//         let all = {};
+
+//         for (let i = 22; i--;)
+//         {
+//             console.log('Day -> ' + i);
+//             for (let j = 0; j < peopleData[i].matches.length; j++)
+//             {
+//                 console.log('Match -> '+ j);
+
+//                 for (let q = 0; q < peopleData[i].matches[j].games.length; q++)
+//                 {
+//                     if (peopleData[i].matches[j].games.length != 1) 
+//                     {
+//                         all[peopleData[i].matches[j].id] = ( typeof all[peopleData[i].matches[j].id] != 'undefined' && all[peopleData[i].matches[j].id] instanceof Array ) ? all[peopleData[i].matches[j].id] : []
+
+//                         if(peopleData[i].matches[j].games[q].status != 'SCHEDULED')
+//                         {
+//                             console.log('Game -> '+ q);
+
+//                             all[peopleData[i].matches[j].id].push(peopleData[i].matches[j].games[q].id) 
+//                         }
+//                     }
+//                     else
+//                     {
+//                         console.log('Game -> '+ q);
+                        
+//                         all[peopleData[i].matches[j].id] = peopleData[i].matches[j].games[q].id;
+//                     }
+//                 }
+//             }
+//         }
+
+//         console.log(all);
+
+//         fs.writeFile('data\\LEC\\winter 2020-2021\\listMatchesToGames.json', JSON.stringify(all), 'utf8', (err)=>
+//         {
+//             if(err)
+//             {
+//                 console.log(err)
+//             }
+//         });
+
+//         res.send('scraped the listMatchesToGames from LEC fantasy');
+// });
+
+// // Scrapt the json file from the lfl website
+// app.get("/LECscrap", async (req, res) => 
+// {
+//     res.setHeader("Content-Type", "text/html");
+
+//     let lecListofMatchesAndGames;            // charger le fichier matchesGames.json
+
+//     fs.readFile('data\\LEC\\winter 2020-2021\\listMatchesToGames.json', 'utf8', (err, data) => 
+//     { 
+//         if (err) 
+//         { 
+//             console.log(`Error reading file from disk: ${err}`); 
+//         } 
+//         else 
+//         { 
+//             // matches : games
+//             lecListofMatchesAndGames = JSON.parse(data); 
+
+//             console.log(lecListofMatchesAndGames)
+            
+//             for (let m in lecListofMatchesAndGames)
+//             {
+//                 https.get(lecMatches + m, function(res) 
+//                 {
+//                     var body = '';
+
+//                     res.on('data', function(chunk) 
+//                     {
+//                       body += chunk;
+//                     });
+
+//                     res.on('end', function() 
+//                     {
+//                         const matches =  JSON.parse(body).data;
+
+//                         console.log('matche : ' + Object.keys(lecListofMatchesAndGames).indexOf(m) + ' - ' + m);
+
+//                         fs.writeFile('data\\LEC\\winter 2020-2021\\allData\\' + m + '.json', JSON.stringify(matches), 'utf8', (err)=>
+//                         {
+//                             if(err)
+//                             {
+//                                 console.log(err)
+//                             }
+//                         })
+
+//                         if (lecListofMatchesAndGames[m] instanceof Array)
+//                         {
+//                             lecListofMatchesAndGames[m].forEach(element => 
+//                             {
+//                                 https.get(lecGames + element, function(res) 
+//                                 {
+//                                     var body = '';
+
+//                                     res.on('data', function(chunk) {
+//                                         body += chunk;
+//                                     });
+
+//                                     res.on('end', function() 
+//                                     {
+//                                         const games =  JSON.parse(body).data;
+
+//                                         console.log('game : ' + lecListofMatchesAndGames[m].indexOf([element]) + ' - ' + element);
+        
+//                                         fs.writeFile('data\\LEC\\winter 2020-2021\\allData\\' + element + '.json', JSON.stringify(games), 'utf8', (err)=>
+//                                         {
+//                                             if(err)
+//                                             {
+//                                                 console.log(err)
+//                                             }
+//                                         });
+//                                     });
+//                                 }).on('error', function(e) {
+//                                     console.log("Got error: " + e.message);
+//                                 }); 
+//                             })
+//                         }
+//                         else
+//                         {
+//                             https.get(lecGames + lecListofMatchesAndGames[m], function(res) 
+//                             {
+//                                 var body = '';
+
+//                                 res.on('data', function(chunk) {
+//                                   body += chunk;
+//                                 });
+
+//                                 res.on('end', function() 
+//                                 {
+//                                     const games =  JSON.parse(body).data;
+
+//                                     console.log('game : ' + lecListofMatchesAndGames[m].indexOf(lecListofMatchesAndGames[m]) + ' - ' + lecListofMatchesAndGames[m]);
+        
+//                                     fs.writeFile('data\\LEC\\winter 2020-2021\\allData\\' + lecListofMatchesAndGames[m] + '.json', JSON.stringify(games), 'utf8', (err)=>
+//                                     {
+//                                         if(err)
+//                                         {
+//                                             console.log(err)
+//                                         }
+//                                     });
+//                                 });
+//                             }).on('error', function(e) {
+//                                 console.log("Got error: " + e.message);
+//                             }); 
+//                         }
+//                     });
+//                 }).on('error', function(e) {
+//                     console.log("Got error: " + e.message);
+//                 }); 
+//             }
+//         }
+//     });
+// });
+
+// app.get("/LECcompareListOfRealNameJson", async(req, res) => 
+// {
+//     res.setHeader("Content-Type", "text/html");
+    
+//     // matches : games
+//     data = JSON.parse(fs.readFileSync('data\\LEC\\winter 2020-2021\\listMatchesToGames.json', 'utf8'));
+
+//     lecListofMatchesAndGames = [];
+
+//     for (let [key, value] of Object.entries(data)) 
+//     {
+//         lecListofMatchesAndGames.push(key);  
+//         if (value instanceof Object)
+//         {
+//             for (let prop in value)
+//             {
+//                 lecListofMatchesAndGames.push(value[prop]);
+//             }
+//         }
+//         else{
+//             lecListofMatchesAndGames.push(value);
+//         }
+//     }
+
+//     fs.readdir('data\\LEC\\winter 2020-2021\\allData\\', (err, data) => 
+//     {
+//         //console.log(filess)
+//         files = data.map(e => e.replace('.json', ''))
+
+//         files.forEach(file => 
+//         {
+//             console.log('json : ' + files.indexOf(file));
+
+//             if (!lecListofMatchesAndGames.includes(file))
+//             {
+//                 console.log(lecListofMatchesAndGames.includes(file))
+//                 console.log(file)
+//             }
+//             else
+//             {
+//                 console.log(lecListofMatchesAndGames.includes(file))
+//             }
+//         });
+//     });
+//     res.send('Compared matches & games');
 // });
